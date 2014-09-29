@@ -1,34 +1,10 @@
 #!/bin/bash
-ES_HOST=${ES_HOST:-\"+window.location.hostname+\"}
-ES_PORT=${ES_PORT:-9200}
-ES_SCHEME=${ES_SCHEME:-http}
 
-cat << EOF > /usr/share/nginx/html/config.js
-define(['settings'],
-function (Settings) {
-  return new Settings({
-    elasticsearch: "$ES_SCHEME://$ES_HOST:$ES_PORT",
-    default_route     : '/dashboard/file/logstash.json',
-    kibana_index: "kibana-int",
-    panel_names: [
-      'histogram',
-      'map',
-      'goal',
-      'table',
-      'filtering',
-      'timepicker',
-      'text',
-      'hits',
-      'column',
-      'trends',
-      'bettermap',
-      'query',
-      'terms',
-      'stats',
-      'sparklines'
-    ]
-  });
-});
-EOF
+cd /home
+# Loop until confd has updated the logstash config
+until confd -onetime -node 'http://'$ETCD_HOST':'$ETCD_PORT  -config-file /etc/confd/conf.d/kibana.toml; do
+  echo "[kibana] waiting for confd to refresh config.js (waiting for ElasticSearch to be available)"
+  sleep 5
+done
 
 nginx -c /etc/nginx/nginx.conf

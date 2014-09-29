@@ -1,0 +1,14 @@
+[template]
+src   = "config.js.tmpl"
+dest  = "/usr/share/nginx/kibana3/config.js"
+owner = "root"
+group = "root"
+mode  = "0644"
+keys = [
+  "/elasticsearchmaster/elasticsearch",
+]
+
+#check_cmd  = "/usr/sbin/nginx -t -c {{ .src }}"
+#reload_cmd = "/usr/sbin/service nginx restart"
+
+
